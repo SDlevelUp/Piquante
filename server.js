@@ -1,9 +1,9 @@
+// APPELER LE MODULE HTTP
 const http = require('http');
 const app = require('./app');
 
 
-// Restructuration du code initial (server.js)
-// Renvoie un port valide: fourni sous forme d'un numéro ou d'une chaîne
+/********* Renvoie un port valide, qu'il soit fourni sous la forme d'un numéro ou d'une chaîne *********/
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -15,9 +15,14 @@ const normalizePort = val => {
   }
   return false;
 };
+
+/********* Obtention du port de l'environnement et le stocker dans Express. *********/
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
+
+/********* Écoute d'événement : pour l'événement "erreur" du serveur HTTP *********/
+//errorHandler : recherche les différentes erreurs et les gère de manière appropriée
 const errorHandler = error => {
   if (error.syscall !== 'listen') {
     throw error;
@@ -38,8 +43,12 @@ const errorHandler = error => {
   }
 };
 
+
+/********* Fabrication du server HTTP *********/
 const server = http.createServer(app);
 
+
+/********* Écoute d'événement : pour le server HTTP *********/
 server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
