@@ -13,8 +13,8 @@ const bodyParser = require('body-parser');
 const sanitize = require('express-mongo-sanitize');
 
 // Déclaration des routes à utilisées
-const saucesRoutes = require('./routes/sauces');
-const userRoutes = require('./routes/user');
+const saucesRoutes = require('./backend/routes/sauces');
+const userRoutes = require('./backend/routes/user');
 
 // ELABORATION DE L'APP EXPRESS
 const app = express();
