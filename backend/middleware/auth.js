@@ -3,6 +3,8 @@
 // Importation de jsonwebtoken / sert à créer et vérifier les tokens
 const jwt = require('jsonwebtoken');
 
+//Variables d'environnement 
+const dotenv = require("dotenv").config();
 //Utilisation de ce middleware pour vérifier que l'USER est bien connecté et
 //....transmettre les informations de connexions
 module.exports = (req, res, next) => {

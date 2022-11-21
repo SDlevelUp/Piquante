@@ -68,7 +68,7 @@ exports.modifySauce = (req, res, next) => {
           }
         })
             .catch((error) => {
-                res.status(400).json({ error });
+            res.status(400).json({ error });
     });
 }
 
@@ -79,8 +79,8 @@ exports.deleteSauce = (req, res, next) => {
         if (sauce.userId != req.auth.userId) {
           res.status(401).json({ message: 'Vous n\'êtes pas autorisé à supprimer cette sauce'  });
         } else {
-          const filename = sauce.imageUrl.split("/images/")[1];
-          fs.unlink(`images/${filename}`, () => {
+          const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];
+          fs.unlink(`images/${deleteFileImgStorage}`, () => {
             Sauce.deleteOne({ _id: req.params.id })
               .then(() => {
                 res.status(200).json({ message: 'Sauce supprimée !' });
@@ -141,6 +141,7 @@ exports.likeOrDislike = (req, res, next) => {
             Sauce.updateOne(
               { _id: req.params.id },
               {
+                // UserId est supprimé du tableau des usersDisliked et on décrémente disLikes
                 $pull: { usersDisliked: req.body.userId },
                 $inc: { dislikes: -1 },
               }

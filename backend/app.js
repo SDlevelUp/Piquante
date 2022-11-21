@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const path = require('path');
 const helmet = require('helmet');
 
-//On importe le package dotenv : c'est la clé secrète du cryptage d'e-mail
-require('dotenv').config();
+//Dotenv = Importer un fichier de variables d'environnement.
+const dotenv = require("dotenv").config();
 
 const bodyParser = require('body-parser');
 
@@ -29,11 +29,9 @@ const apiLimiter = rateLimit({
 })
 
 // Connexion à mongoDB
-mongoose
-  .connect(
-    'mongodb+srv://Sarah:Michmich-91@cluster0.p3w5kdv.mongodb.net/?retryWrites=true&w=majority',
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
+mongoose.connect(process.env.MONGODB_URI,
+  { useNewUrlParser: true,
+      useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
