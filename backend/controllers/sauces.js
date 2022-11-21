@@ -41,20 +41,36 @@ exports.modifySauce = (req, res, next) => {
   } : { ...req.body };
 
   delete sauceObject._userId;
+
   Sauce.findOne({_id: req.params.id})
       .then((sauce) => {
+         // VERIFICATION : on vérifie que l'auteur de la sauce est bien l'auteur connecté
+            // SINON => MESSAGE D'ERREUR
           if (sauce.userId != req.auth.userId) {
               res.status(401).json({ message : 'Not authorized'});
           } else {
-              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-              .then(() => res.status(200).json({message : 'Objet modifié!'}))
-              .catch(error => res.status(401).json({ error }));
+            // Récupération du fichier image à supprimer, si ok
+              const reqFileToDelete = req.file;
+              // => On met à jour les modofications
+          if(!reqFileToDelete) {
+                Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+                .then(() => res.status(200).json({message : 'Sauce modifiée!'}))
+                .catch(error => res.status(401).json({ error }));
+          } else {
+              // Fichier existant ? = > Supprimer l'ancienne image dans le dossier '/images'
+              const deleteFileImgStorage = sauce.imageURL.split('/images')[1];
+                fs.unlink(`images/${deleteFileImgStorage}`, () => {
+                  Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+                  .then(() => res.status(200).json({message : 'Sauce modifiée!'}))
+                  .catch(error => res.status(401).json({ error }));
+              })
+            }
           }
-      })
-      .catch((error) => {
-          res.status(400).json({ error });
-      });
-};
+        })
+            .catch((error) => {
+                res.status(400).json({ error });
+    });
+}
 
 //SUPPRESSION D'UNE SAUCE
 exports.deleteSauce = (req, res, next) => {
