@@ -2,27 +2,35 @@
 
 [specP6.pdf](https://github.com/SarahBerri/Piquante/files/10086830/specP6.pdf)
 
-
 ----
 
-KANAP: Cinquième projet du cursus "DEVELOPPEMENT WEB" chez Openclassrooms : Construisez un site e-commerce en JavaScript.
+PIIQUANTE : Sixième projet du cursus "DEVELOPPEMENT WEB" :
+
+Construisez une API sécurisée pour une application d'avis gastronomiques
 
 *How to run the project ?*
 
-This is the front end and back end server for Project 5 of the Web Developer path.
+First clone this repository for the frontend
 
-### Back end Prerequisites ###
+`git clone https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6`
 
-You will need to have Node and `npm` installed locally on your machine.
+Then clone this repository for the backend
 
-### Back end Installation ###
+Add a folder named "images" in the backend
 
-Clone this repo. From the "back" folder of the project, run `npm install`. You 
-can then run the server with `node server`. 
-The server should run on `localhost` with default port `3000`. If the
-server runs on another port for any reason, this is printed to the
-console when the server starts, e.g. `Listening on port 3001`.
+Start server on backend folder
 
+`cd backend`
+
+`nodemon server`
+
+Start the frontend, with the following manipulation:
+
+`cd frontend`
+
+`npm start`
+
+Bonne visite !
 ---- 
 
 **SENARIO**
@@ -60,7 +68,6 @@ Vous êtes prêt à vous lancer dans l'API ! C’est parti !
 ----
 
 **COMPÉTANCES ET LIVRABLES**
-
 
 ## Compétances demandées et évaluées 
 
