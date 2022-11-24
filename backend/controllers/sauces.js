@@ -20,29 +20,73 @@ exports.createSauce = (req, res, next) => {
   //Même si tout se passe bien et que tout est enregistrer, il faut :
   // 1. Retourner une promise, renvoyer une réponse au frontend (sinon la requête expire) 
       .then(() => res.status(201).json({ message: 'Saved sauce' })) // CODE 201 : BONNE CRÉATION DE RESSOURCE + ENVOI DE RÉPONSE AU JSON
-      // 2. Récupérer l'erreur et renvoyer un code 400,
+      // 2. Récupérer l'erreur et renvoyer un code 400
       .catch(error => res.status(400).json({ error })); //Equivaut à error : error
 };
 
 // AFFICHER LA SAUCE SUR LAQUELLE ON CLIQUE
-//Trouver un seul objet dans ka BDD par son identifiant, (l'id apparait dans la barre de recherche quand on clique sur la sauce)
+//Trouver un seul objet dans la BDD par son identifiant, (l'id apparait dans la barre de recherche quand on clique sur la sauce)
 exports.getOneSauce = (req, res, next) => {
   // L'identifiant va envoyer l'id de l'objet
+  // On veut que l'id de la sauce soit le même soit le même que le paramètre de la requête (càd : GET)
   Sauce.findOne({_id: req.params.id})
+  //1. Retourner une promise, renvoyer une réponse au frontend (sinon la requête expire) 
   .then(
+    //Retrouver la sauce si elle existe dans notre BDD
     (sauce) => {
-      res.status(200).json(sauce);
+      res.status(200).json(sauce); // CODE 201 : BONNE CRÉATION DE RESSOURCE + ENVOI DE RÉPONSE AU JSON
     }
-  ).catch(
-    (error) => {
-      res.status(404).json({
-        error: error
-      });
+    // 2. Récupérer l'erreur et renvoyer un code 404 // si OBJET NON TROUVÉ ou ERREUR
+  ).catch((error) => {res.status(404).json({error});
     }
   );
 };
 
-// MODIFICATION D'UNE SAUCE
+// // MODIFICATION D'UNE SAUCE EXISTANTE
+// exports.modifySauce = (req, res, next) => {
+//   const sauceObject = req.file ? {
+//       ...JSON.parse(req.body.sauce),
+//       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+//   } : { ...req.body };
+
+//   delete sauceObject._userId;
+// // On veut que l'id de la sauce soit le même soit le même que le paramètre de la requête (càd : delete)
+//   Sauce.findOne({_id: req.params.id})
+//       .then((sauce) => {
+//          // VERIFICATION : L'auteur de la sauce est bien la bonne personne (connectée)
+//             // SINON => MESSAGE D'ERREUR
+//           if (sauce.userId != req.auth.userId) {
+//               res.status(401).json({ message : 'Not authorized'});
+//           } else {
+//             // Récupération du fichier image à supprimer, si ok
+//               const reqFile = req.file;
+//               // => On met à jour les modifications
+//               //Si le fichier à modifier est présent
+//           if(!reqFile) {
+//             // Nouvelle version de l'objet (être sûr d'avoir les bons identifiants)
+//                 Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})//Il faut que l'id correspond à celui des paramètre 
+//                 //1. Promise : renvoie une réponse OK (objet modifié)
+//                 .then(() => res.status(200).json({message : 'Modified sauce!'}))
+//                 //2. Erreur 
+//                 .catch(error => res.status(401).json({ error }));
+//           } else {
+//               // Fichier existant ? = > Supprimer l'ancienne image dans le dossier '/images'
+//               const deleteFileImgToStorage = sauce.imageURL.split('/images')[1];
+//                 fs.unlink(`images/${deleteFileImgToStorage}`, () => {
+//                   //Met à jour notre dossier image avec la mise en évidence du fichier image supprimé
+//                   Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+//                   .then(() => res.status(200).json({message : 'Modified sauce!'}))
+//                   .catch(error => res.status(401).json({ error }));
+//               })
+//             }
+//           }
+//         })
+//             .catch((error) => {
+//             res.status(400).json({ error });
+//     });
+// }
+
+
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ? {
       ...JSON.parse(req.body.sauce),
@@ -50,49 +94,35 @@ exports.modifySauce = (req, res, next) => {
   } : { ...req.body };
 
   delete sauceObject._userId;
-
   Sauce.findOne({_id: req.params.id})
       .then((sauce) => {
-         // VERIFICATION : on vérifie que l'auteur de la sauce est bien l'auteur connecté
-            // SINON => MESSAGE D'ERREUR
           if (sauce.userId != req.auth.userId) {
-              res.status(401).json({ message : 'Not authorized'});
+              res.status(403).json({ message : 'Not authorized'});
           } else {
-            // Récupération du fichier image à supprimer, si ok
-              const reqFileToDelete = req.file;
-              // => On met à jour les modofications
-          if(!reqFileToDelete) {
-                Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : 'Sauce modifiée!'}))
-                .catch(error => res.status(401).json({ error }));
-          } else {
-              // Fichier existant ? = > Supprimer l'ancienne image dans le dossier '/images'
-              const deleteFileImgStorage = sauce.imageURL.split('/images')[1];
-                fs.unlink(`images/${deleteFileImgStorage}`, () => {
-                  Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-                  .then(() => res.status(200).json({message : 'Sauce modifiée!'}))
-                  .catch(error => res.status(401).json({ error }));
-              })
-            }
+              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+              .then(() => res.status(200).json({message : 'Modified sauce!'}))
+              .catch(error => res.status(401).json({ error }));
           }
-        })
-            .catch((error) => {
-            res.status(400).json({ error });
-    });
-}
+      })
+      .catch((error) => {
+          res.status(400).json({ error });
+      });
+};
+
+
 
 //SUPPRESSION D'UNE SAUCE
 exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {
         if (sauce.userId != req.auth.userId) {
-          res.status(401).json({ message: 'Vous n\'êtes pas autorisé à supprimer cette sauce'  });
+          res.status(401).json({ message: 'You are not allowed to delete this sauce' });
         } else {
           const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];
           fs.unlink(`images/${deleteFileImgStorage}`, () => {
             Sauce.deleteOne({ _id: req.params.id })
               .then(() => {
-                res.status(200).json({ message: 'Sauce supprimée !' });
+                res.status(200).json({ message: 'Sauce removed !' });
               })
               .catch((error) => res.status(400).json({ error }));
           });
@@ -115,7 +145,7 @@ exports.likeOrDislike = (req, res, next) => {
           $push: { usersLiked: req.body.userId },
         }
       )
-        .then(() => res.status(200).json({ message: "Like ajouté !" }))
+        .then(() => res.status(200).json({ message: 'Like added !' }))
         .catch((error) => res.status(400).json({ error }));
     } else if (req.body.like === -1) {
       // Si l'utilisateur n'aime pas la sauce
@@ -127,7 +157,7 @@ exports.likeOrDislike = (req, res, next) => {
           $push: { usersDisliked: req.body.userId },
         }
       )
-        .then(() => res.status(200).json({ message: "Dislike ajouté !" }))
+        .then(() => res.status(200).json({ message: "Dislike added !" }))
         .catch((error) => res.status(400).json({ error }));
     } else {
       // Si like === 0 l'utilisateur supprime son vote
@@ -141,7 +171,7 @@ exports.likeOrDislike = (req, res, next) => {
               { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
             )
               .then(() => {
-                res.status(200).json({ message: "Like supprimé !" });
+                res.status(200).json({ message: 'Like deleted !' });
               })
               .catch((error) => res.status(400).json({ error }));
           } else if (sauce.usersDisliked.includes(req.body.userId)) {
@@ -156,7 +186,7 @@ exports.likeOrDislike = (req, res, next) => {
               }
             )
               .then(() => {
-                res.status(200).json({ message: "Dislike supprimé !" });
+                res.status(200).json({ message: 'Dislike deleted !' });
               })
               .catch((error) => res.status(400).json({ error }));
           }
