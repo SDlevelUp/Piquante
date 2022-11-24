@@ -1,6 +1,10 @@
+// Middleware gestion de la requête POST venant de l'application front-end pour extraire le corps JSON
 const express = require('express');
+
+// Middleware d'importation de MongoDB
 const mongoose = require('mongoose');
 
+require('dotenv').config()
 
 // Path : donne accés au chemin du système de fichiers
 const path = require('path');
@@ -33,7 +37,7 @@ const apiLimiter = rateLimit({
 	legacyHeaders: false, // Désactiver les en-têtes `X-RateLimit-*
 })
 
-// Connexion à mongoDB
+// Connexion à mongoDB : facilite les interactions entre l'application Express et la base de données MongoDB
 mongoose.connect(
   "mongodb+srv://Sarah:Michmich-91@cluster0.p3w5kdv.mongodb.net/?retryWrites=true&w=majority",
   { useNewUrlParser: true,
@@ -42,9 +46,11 @@ mongoose.connect(
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 
-// MIDDLEWARE GENERAL : Ajout de headers à l'objet réponse qu'on revoit au navigateur
+//CORS « Cross Origin Resource Sharing » 
+//Blocage des appels HTTP entre des serveurs différents => empêche les requêtes malveillantes d'accéder à des ressources sensibles
 app.use((req, res, next) => {
-  //Tout le monde peut y accéder
+  // MIDDLEWARE GENERAL : Ajout de headers à l'objet réponse qu'on renvoit au navigateur
+  //Accéder à l'API depuis n'importe quelle origine avec => '*' 
   res.setHeader('Access-Control-Allow-Origin', '*');
   // Autorisation pour utiliser certains Headers sur l'objet requête
   res.setHeader(
@@ -54,6 +60,7 @@ app.use((req, res, next) => {
   // ...ainsi que certaines méthodes, verbes de requêtes : GET, POST, PUT, etc.
   res.setHeader(
     'Access-Control-Allow-Methods',
+    //Envoyer des requêtes :
     'GET, POST, PUT, DELETE, PATCH, OPTIONS'
   );
   // Appeler next: passer l'éxecution au middleware d'après

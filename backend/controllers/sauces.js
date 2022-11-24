@@ -7,20 +7,29 @@ const fs = require('fs');
 // CREER UNE SAUCE
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
+  // Vu que le frontend renvoie également un id (générer automatiquement par MongoDB),
+  // ... on va enlever le champ id du corps de la requête avant de copier l'objet
   delete sauceObject._id;
   const sauce = new Sauce({
+    //Opérateur "spread" : copier les champs qui sont dans le corps de la request
       ...sauceObject,
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   });
+  // Enregistrement de la sauce dans a BDD avec la méthode 'save'...
   sauce.save()
-      .then(() => res.status(201).json({ message: 'Sauce enregistrée' }))
-      .catch(error => res.status(400).json({ error }));
+  //Même si tout se passe bien et que tout est enregistrer, il faut :
+  // 1. Retourner une promise, renvoyer une réponse au frontend (sinon la requête expire) 
+      .then(() => res.status(201).json({ message: 'Saved sauce' })) // CODE 201 : BONNE CRÉATION DE RESSOURCE + ENVOI DE RÉPONSE AU JSON
+      // 2. Récupérer l'erreur et renvoyer un code 400,
+      .catch(error => res.status(400).json({ error })); //Equivaut à error : error
 };
 
 // AFFICHER LA SAUCE SUR LAQUELLE ON CLIQUE
+//Trouver un seul objet dans ka BDD par son identifiant, (l'id apparait dans la barre de recherche quand on clique sur la sauce)
 exports.getOneSauce = (req, res, next) => {
-  Sauce.findOne({_id: req.params.id
-}).then(
+  // L'identifiant va envoyer l'id de l'objet
+  Sauce.findOne({_id: req.params.id})
+  .then(
     (sauce) => {
       res.status(200).json(sauce);
     }

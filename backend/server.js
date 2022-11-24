@@ -43,7 +43,6 @@ const errorHandler = error => {
   }
 };
 
-
 /********* Fabrication du server HTTP *********/
 const server = http.createServer(app);
 

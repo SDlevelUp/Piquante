@@ -1,8 +1,14 @@
-/**** MODELE DE SAUCE : PROVENANCE, DESCRIPTION, ETC ****/
+/**** MÉTHODE MODEL : TRANSFORME LE MODEL EN MODÈLE UTILISABLE ****/
+//Pouvoir lire, enregistrer et modifier les objets  en vente dans notre BDD
 
-const mongoose = require('mongoose');
+//Importation de Mongoose pour créer le schéma
+const mongoose = require('mongoose');//require : importation de la librairie et ses fonctions
 
-const sauceSchema = mongoose.Schema({
+// Élaboration de notre schéma de données pour notre BDD MongoDB.
+const sauceSchema = mongoose.Schema({//mongoose.Schema : package mis à disposition par le package Mongoose
+  //...qui va lui dicter les différents champs dont notre sauceSchema à besoin
+
+  // Élaboration de notre 'objet' : "required: true" (sans titre par exemple, on ne pourra pas enregistrer la sauce dans notre BDD)
   userId: { type: String, required: true },
   name: { type: String, required: true },
   manufacturer: { type: String, required: true },
@@ -16,4 +22,5 @@ const sauceSchema = mongoose.Schema({
   usersDisliked: { type: [String] },
 });
 
+//Exportation du modèle terminer : en arguments => le nom du modèle et le schéma utilisé
 module.exports = mongoose.model("Sauce", sauceSchema);
