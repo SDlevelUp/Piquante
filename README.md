@@ -77,7 +77,6 @@ Vous êtes prêt à vous lancer dans l'API ! C’est parti !
 
 * Stocker des données de manière sécurisée
 
----- 
 
 ## Les livrables 
 
