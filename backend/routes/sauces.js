@@ -14,6 +14,7 @@ const saucesCtrl = require('../controllers/sauces');
 
 //get() pour répondre uniquement aux demandes GET
 router.get('/', auth, saucesCtrl.getAllSauces);
+
 router.post('/', auth, multer, saucesCtrl.createSauce);
 //:id => rendre la route accessible en tant que paramètre
 router.get('/:id', auth, saucesCtrl.getOneSauce);
@@ -23,6 +24,8 @@ router.put('/:id', auth, multer, saucesCtrl.modifySauce);
 
 // Route : suppression d'un objet existant
 router.delete('/:id', auth, saucesCtrl.deleteSauce);
+
+//Route POST: like ou dislike selon l'id de l'user
 router.post('/:id/like', auth, saucesCtrl.likeOrDislike);
 
 module.exports = router;

@@ -38,8 +38,7 @@ const apiLimiter = rateLimit({
 })
 
 // Connexion à mongoDB : facilite les interactions entre l'application Express et la base de données MongoDB
-mongoose.connect(
-  "mongodb+srv://Sarah:Michmich-91@cluster0.p3w5kdv.mongodb.net/?retryWrites=true&w=majority",
+mongoose.connect(process.env.MONGODB_URI,
   { useNewUrlParser: true,
       useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))

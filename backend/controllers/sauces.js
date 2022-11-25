@@ -2,6 +2,8 @@
 
 // IMPORTATION MODEL SAUCE
 const Sauce = require('../models/Sauces');
+
+// Appel du package fs de Node
 const fs = require('fs');
 
 // CREER UNE SAUCE
@@ -42,88 +44,69 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
-// // MODIFICATION D'UNE SAUCE EXISTANTE
-// exports.modifySauce = (req, res, next) => {
-//   const sauceObject = req.file ? {
-//       ...JSON.parse(req.body.sauce),
-//       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-//   } : { ...req.body };
 
-//   delete sauceObject._userId;
-// // On veut que l'id de la sauce soit le même soit le même que le paramètre de la requête (càd : delete)
-//   Sauce.findOne({_id: req.params.id})
-//       .then((sauce) => {
-//          // VERIFICATION : L'auteur de la sauce est bien la bonne personne (connectée)
-//             // SINON => MESSAGE D'ERREUR
-//           if (sauce.userId != req.auth.userId) {
-//               res.status(401).json({ message : 'Not authorized'});
-//           } else {
-//             // Récupération du fichier image à supprimer, si ok
-//               const reqFile = req.file;
-//               // => On met à jour les modifications
-//               //Si le fichier à modifier est présent
-//           if(!reqFile) {
-//             // Nouvelle version de l'objet (être sûr d'avoir les bons identifiants)
-//                 Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})//Il faut que l'id correspond à celui des paramètre 
-//                 //1. Promise : renvoie une réponse OK (objet modifié)
-//                 .then(() => res.status(200).json({message : 'Modified sauce!'}))
-//                 //2. Erreur 
-//                 .catch(error => res.status(401).json({ error }));
-//           } else {
-//               // Fichier existant ? = > Supprimer l'ancienne image dans le dossier '/images'
-//               const deleteFileImgToStorage = sauce.imageURL.split('/images')[1];
-//                 fs.unlink(`images/${deleteFileImgToStorage}`, () => {
-//                   //Met à jour notre dossier image avec la mise en évidence du fichier image supprimé
-//                   Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
-//                   .then(() => res.status(200).json({message : 'Modified sauce!'}))
-//                   .catch(error => res.status(401).json({ error }));
-//               })
-//             }
-//           }
-//         })
-//             .catch((error) => {
-//             res.status(400).json({ error });
-//     });
-// }
-
-
+//MODIFICATION SAUCE EXISTANTE
 exports.modifySauce = (req, res, next) => {
+  //Voir si il y a un fichier existant dans notre requête
   const sauceObject = req.file ? {
-      ...JSON.parse(req.body.sauce),
+    //Si c'est le cas : 
+    // Gestion du cas dans lequel la requête est faite par un fichier
+      // Récupérer l'objet en parsant la chaîne
+    ...JSON.parse(req.body.sauce),
+    // Et on recréer l'URL de l'image
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   } : { ...req.body };
 
+  //AUTRE MESURE DE SÉCURITÉ 
+  // On doit aussi supprimer l'user id venant de la requête
   delete sauceObject._userId;
+  //On récupère la sauce de notre BDD pur voir si c'est bien l'utilisateur qui est à l'origine de la modification de l'objet
   Sauce.findOne({_id: req.params.id})
+      //Promise 
+      //En cas de succès : on résupère l'objet 
       .then((sauce) => {
-          if (sauce.userId != req.auth.userId) {
+        //et on vérifie qu'il appartient à l'utilisateur qui effectue la modification
+          if (sauce.userId != req.auth.userId) { //Si le champ userId récupérer est différent de l'user id venant du token => qqun modifie un objet ne lui appartenant pas
               res.status(403).json({ message : 'Not authorized'});
           } else {
-              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})
+            //Cas où l'userId est OK : Mettre à jour l'enregistrement de la modification
+              Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})//...sauceObject, _id : ce qui est récupérer avec l'Id venant des paramètre de l'URL
+              //Réussite: code 200
               .then(() => res.status(200).json({message : 'Modified sauce!'}))
               .catch(error => res.status(401).json({ error }));
           }
       })
+      //Échec: code 400
       .catch((error) => {
           res.status(400).json({ error });
       });
 };
 
 
+//SUPPRESSION D'UNE SAUCE UNIQUEMENT SI C'EST LE BON UTILISATEUR QUI LE DEMANDE
 
-//SUPPRESSION D'UNE SAUCE
 exports.deleteSauce = (req, res, next) => {
+  //On récupère l'objet 
+  //On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
     Sauce.findOne({ _id: req.params.id })
-      .then((sauce) => {
+    //Promise
+    .then((sauce) => {
+        // On vérifie bien si l'userId qui fait la manip ne correspond pas à l'utilisateur authentifié
         if (sauce.userId != req.auth.userId) {
+          //Renvoie un message d'erreur si c'est pas le cas
           res.status(401).json({ message: 'You are not allowed to delete this sauce' });
         } else {
-          const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];
-          fs.unlink(`images/${deleteFileImgStorage}`, () => {
+          //Sinon, on peut passer à l'étape suivante : la suppression de l'image du dossier backend
+          //Constante pour appeler le fichier à supprimer
+          const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];//Récupération du nom du fichier avec split autour du répertoire image
+          //Supprimer le fichier avec la méthode unlink de fs
+          fs.unlink(`images/${deleteFileImgStorage}`, () => { //() => { : Callback : méthode qui va être appelée une fois que la suppression aura eu lieu, la suppression est faite de manière asynchrones
             Sauce.deleteOne({ _id: req.params.id })
               .then(() => {
+                //Réussite: code 200
                 res.status(200).json({ message: 'Sauce removed !' });
               })
+              // Échec: code 400
               .catch((error) => res.status(400).json({ error }));
           });
         }
