@@ -4,7 +4,7 @@ const express = require('express');
 // Middleware d'importation de MongoDB
 const mongoose = require('mongoose');
 
-require('dotenv').config()
+require('dotenv').config();
 
 // Path : donne accés au chemin du système de fichiers
 const path = require('path');
@@ -19,7 +19,7 @@ const helmet = require('helmet');
 // Sanitize = Il supprimera toutes les clés commençant par '$', ainsi assainir votre code
 const sanitize = require('express-mongo-sanitize');
 
-// Déclaration des routes à utilisées
+// Importation des routes 
 const saucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 

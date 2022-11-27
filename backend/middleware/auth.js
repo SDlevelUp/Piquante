@@ -5,11 +5,13 @@ const jwt = require('jsonwebtoken');
 
 //Variables d'environnement 
 const dotenv = require("dotenv").config();
+
 //Utilisation de ce middleware pour vérifier que l'USER est bien connecté et
 //....transmettre les informations de connexions
 module.exports = (req, res, next) => {
   // Gestion des erreurs
   try {
+    //Récupération du header d'autorisation de la requête
     const token = req.headers.authorization.split(' ')[1]; // Spliter/Diviser la chaine de caractère en tableau
     // Décodage du TOKEN
     const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');

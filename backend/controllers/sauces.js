@@ -6,6 +6,9 @@ const Sauce = require('../models/Sauces');
 // Appel du package fs de Node
 const fs = require('fs');
 
+
+/***********************POST***********************/
+
 // CREER UNE SAUCE
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
@@ -26,6 +29,8 @@ exports.createSauce = (req, res, next) => {
       .catch(error => res.status(400).json({ error })); //Equivaut à error : error
 };
 
+
+/***********************GET***********************/
 // AFFICHER LA SAUCE SUR LAQUELLE ON CLIQUE
 //Trouver un seul objet dans la BDD par son identifiant, (l'id apparait dans la barre de recherche quand on clique sur la sauce)
 exports.getOneSauce = (req, res, next) => {
@@ -44,6 +49,7 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
+/***********************PUT***********************/
 
 //MODIFICATION SAUCE EXISTANTE
 exports.modifySauce = (req, res, next) => {
@@ -83,6 +89,9 @@ exports.modifySauce = (req, res, next) => {
 };
 
 
+
+/***********************DELETE***********************/
+
 //SUPPRESSION D'UNE SAUCE UNIQUEMENT SI C'EST LE BON UTILISATEUR QUI LE DEMANDE
 
 exports.deleteSauce = (req, res, next) => {
@@ -116,55 +125,78 @@ exports.deleteSauce = (req, res, next) => {
       });
 };
 
+
+/***********************POST***********************/
+
 // LIKE / DISLIKE
 exports.likeOrDislike = (req, res, next) => {
-    // Si l'utilisateur aime la sauce
-    if (req.body.like === 1) {
+
+    //Déclaration de variables pour "désengorger la partie "likeOrDislike" :
+    let userId = req.body.userId; 
+    let paramsSauce = req.params.id;
+    let likeSauce = req.body.like;
+
+  // 1. Le User va liker une sauce 
+
+    // Si le corps de la requete a 1 like 
+      if (likeSauce === 1) {
       // On ajoute 1 like et on l'envoie dans le tableau "usersLiked"
       Sauce.updateOne(
-        { _id: req.params.id },
+        //On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
+        { _id: paramsSauce },
         {
-          $inc: { likes: req.body.like++ },
-          $push: { usersLiked: req.body.userId },
+          // User clique sur like => il est pusher dans le tableau des usersLiked
+          $push: { usersLiked: userId},
+          //On incrémente 1 like (c'est-à-dire d'ajouter un)
+          $inc: { likes: +1 },
         }
       )
         .then(() => res.status(200).json({ message: 'Like added !' }))
         .catch((error) => res.status(400).json({ error }));
-    } else if (req.body.like === -1) {
-      // Si l'utilisateur n'aime pas la sauce
+        
+        // Si l'utilisateur n'aime pas la sauce (clique pour la première fois sur 'dislike')
+    } if (likeSauce === -1) {
       // On ajoute 1 dislike et on l'envoie dans le tableau "usersDisliked"
       Sauce.updateOne(
-        { _id: req.params.id },
+        { _id: paramsSauce },
         {
-          $inc: { dislikes: req.body.like++ * -1 },
-          $push: { usersDisliked: req.body.userId },
+          // User clique sur dislike => il est pusher dans le tableau des usersDisliked
+          $push: { usersDisliked: userId },
+
+          //On incrémente 1 dislike (c'est-à-dire d'ajouter un)
+          $inc: { dislikes: +1 },
         }
       )
         .then(() => res.status(200).json({ message: "Dislike added !" }))
         .catch((error) => res.status(400).json({ error }));
-    } else {
-      // Si like === 0 l'utilisateur supprime son vote
-      Sauce.findOne({ _id: req.params.id })
+
+  // 2. User va supprimer son like ou dislike
+        } if (likeSauce === 0) {
+      Sauce.findOne({ _id: paramsSauce })
         .then((sauce) => {
           // Si le tableau "userLiked" contient l'ID de l'utilisateur
-          if (sauce.usersLiked.includes(req.body.userId)) {
-            // On enlève un like du tableau "userLiked"
+          if (sauce.usersLiked.includes(userId)) {
+            // On enlève un like du tableau "userLiked" => on Update
             Sauce.updateOne(
-              { _id: req.params.id },
-              { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } }
+              { _id: paramsSauce },
+              // L'userId est supprimé du tableau 'usersLiked' et on décrémente likes
+              { $pull: { usersLiked: userId }, $inc: { likes: -1 } }
             )
               .then(() => {
                 res.status(200).json({ message: 'Like deleted !' });
               })
               .catch((error) => res.status(400).json({ error }));
-          } else if (sauce.usersDisliked.includes(req.body.userId)) {
+            
+
+          // Enfin : cas où l'utilisateur à déjà cliquer sur le 'dislike'
+          } if (sauce.usersDisliked.includes(userId)) {
             // Si le tableau "userDisliked" contient l'ID de l'utilisateur
             // On enlève un dislike du tableau "userDisliked"
             Sauce.updateOne(
-              { _id: req.params.id },
+              { _id: paramsSauce },
               {
                 // UserId est supprimé du tableau des usersDisliked et on décrémente disLikes
-                $pull: { usersDisliked: req.body.userId },
+                $pull: { usersDisliked: userId },
                 $inc: { dislikes: -1 },
               }
             )
@@ -178,7 +210,9 @@ exports.likeOrDislike = (req, res, next) => {
     }
   };
 
-  // AFFICHER TOUTES LES SAUCES SUR LE SITE
+
+  /***********************GET***********************/
+  // Récupérer toutes les auces dans la BDD
   exports.getAllSauces = (req, res, next) => {
     Sauce.find()
       .then((sauces) => {
