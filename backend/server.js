@@ -1,5 +1,9 @@
-// APPELER LE MODULE HTTP
+/********* Serveur Node *********/
+
+// Importation du package HTTP de Node => Création du serveur
 const http = require('http');
+
+// Importation de notre application
 const app = require('./app');
 
 
@@ -18,6 +22,8 @@ const normalizePort = val => {
 
 /********* Obtention du port de l'environnement et le stocker dans Express. *********/
 const port = normalizePort(process.env.PORT || '3000');
+
+// L'application saura à sur quel port elle doit tourner
 app.set('port', port);
 
 
@@ -55,4 +61,5 @@ server.on('listening', () => {
   console.log('Listening on ' + bind);
 });
 
+// Le serveur sera configuré pour qu'il écoute le port disponible
 server.listen(port);

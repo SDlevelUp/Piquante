@@ -1,9 +1,11 @@
-// Middleware gestion de la requête POST venant de l'application front-end pour extraire le corps JSON
+// Import d'Express pour créer l'application et facilité la gestion des serveurs Node
 const express = require('express');
 
 // Middleware d'importation de MongoDB
 const mongoose = require('mongoose');
 
+// Importer un fichier de variables d'environnement ...
+// ... => masquer le nom d'utilisateur et le mdp lors de la connection à la base de données
 require('dotenv').config();
 
 // Path : donne accés au chemin du système de fichiers
@@ -13,10 +15,7 @@ const path = require('path');
 // => il ajoute des en-têtes HTTP qui empêchent le détournement d’informations.
 const helmet = require('helmet');
 
-//Dotenv = Importer un fichier de variables d'environnement
-// const dotenv = require("dotenv").config();
-
-// Sanitize = Il supprimera toutes les clés commençant par '$', ainsi assainir votre code
+// Import de Mongo-sanitize => pprimera toutes les clés commençant par '$', ainsi assainir votre code
 const sanitize = require('express-mongo-sanitize');
 
 // Importation des routes 

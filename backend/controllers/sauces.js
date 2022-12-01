@@ -1,23 +1,26 @@
 /********* CONTROLLER SAUCE *********/
 
-// IMPORTATION MODEL SAUCE
+// Importation du modèle sauce
 const Sauce = require('../models/Sauces');
 
-// Appel du package fs de Node
+// Appel du package fs de Node => permettant de modifier le système de fichiers
 const fs = require('fs');
 
 
 /***********************POST***********************/
 
-// CREER UNE SAUCE
+// Créer une sauce et l'enregistrer dans la BDD
 exports.createSauce = (req, res, next) => {
+  // Les données envoyées par le frontend sont stockées et transformé en objet JSON
   const sauceObject = JSON.parse(req.body.sauce);
   // Vu que le frontend renvoie également un id (générer automatiquement par MongoDB),
   // ... on va enlever le champ id du corps de la requête avant de copier l'objet
   delete sauceObject._id;
+  // Dans la constante 'sauce' on lui passe comme objet toutes les infos requises  
   const sauce = new Sauce({
     //Opérateur "spread" : copier les champs qui sont dans le corps de la request
       ...sauceObject,
+      //URL de l'image
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
   });
   // Enregistrement de la sauce dans a BDD avec la méthode 'save'...
@@ -34,7 +37,6 @@ exports.createSauce = (req, res, next) => {
 // AFFICHER LA SAUCE SUR LAQUELLE ON CLIQUE
 //Trouver un seul objet dans la BDD par son identifiant, (l'id apparait dans la barre de recherche quand on clique sur la sauce)
 exports.getOneSauce = (req, res, next) => {
-  // L'identifiant va envoyer l'id de l'objet
   // On veut que l'id de la sauce soit le même soit le même que le paramètre de la requête (càd : GET)
   Sauce.findOne({_id: req.params.id})
   //1. Retourner une promise, renvoyer une réponse au frontend (sinon la requête expire) 
@@ -96,7 +98,7 @@ exports.modifySauce = (req, res, next) => {
 
 exports.deleteSauce = (req, res, next) => {
   //On récupère l'objet 
-  //On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
+  //On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres, avec " : "
     Sauce.findOne({ _id: req.params.id })
     //Promise
     .then((sauce) => {
@@ -139,24 +141,24 @@ exports.likeOrDislike = (req, res, next) => {
   // 1. Le User va liker une sauce 
 
     // Si le corps de la requete a 1 like 
-      if (likeSauce === 1) {
-      // On ajoute 1 like et on l'envoie dans le tableau "usersLiked"
+        if (likeSauce === 1) {
+      // Mise à jour des likes avec 'updateOne'
       Sauce.updateOne(
-        //On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
+        // On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
         { _id: paramsSauce },
         {
           // User clique sur like => il est pusher dans le tableau des usersLiked
           $push: { usersLiked: userId},
-          //On incrémente 1 like (c'est-à-dire d'ajouter un)
+          // ... Et on incrémente 1 like (c'est-à-dire d'ajouter un)
           $inc: { likes: +1 },
         }
       )
         .then(() => res.status(200).json({ message: 'Like added !' }))
         .catch((error) => res.status(400).json({ error }));
-        
+      }
         // Si l'utilisateur n'aime pas la sauce (clique pour la première fois sur 'dislike')
-    } if (likeSauce === -1) {
-      // On ajoute 1 dislike et on l'envoie dans le tableau "usersDisliked"
+        if (likeSauce === -1) {
+      // Mise à jour des likes avec 'updateOne'
       Sauce.updateOne(
         { _id: paramsSauce },
         {
@@ -164,15 +166,19 @@ exports.likeOrDislike = (req, res, next) => {
           $push: { usersDisliked: userId },
 
           //On incrémente 1 dislike (c'est-à-dire d'ajouter un)
-          $inc: { dislikes: +1 },
+          $inc: { dislikes: 1 },
         }
       )
         .then(() => res.status(200).json({ message: "Dislike added !" }))
         .catch((error) => res.status(400).json({ error }));
 
-  // 2. User va supprimer son like ou dislike
+
+    // 2. User va supprimer son like ou dislike
+
         } if (likeSauce === 0) {
-      Sauce.findOne({ _id: paramsSauce })
+          // Récupérer la sauce dans BDD
+      Sauce.findOne(
+        { _id: paramsSauce })
         .then((sauce) => {
           // Si le tableau "userLiked" contient l'ID de l'utilisateur
           if (sauce.usersLiked.includes(userId)) {
@@ -187,10 +193,9 @@ exports.likeOrDislike = (req, res, next) => {
               })
               .catch((error) => res.status(400).json({ error }));
             
-
-          // Enfin : cas où l'utilisateur à déjà cliquer sur le 'dislike'
-          } if (sauce.usersDisliked.includes(userId)) {
-            // Si le tableau "userDisliked" contient l'ID de l'utilisateur
+              // Enfin : cas où l'utilisateur à déjà cliquer sur le 'dislike'
+            } else if (sauce.usersDisliked.includes(userId)) {
+              // Si le tableau "userDisliked" contient l'ID de l'utilisateur
             // On enlève un dislike du tableau "userDisliked"
             Sauce.updateOne(
               { _id: paramsSauce },
@@ -206,16 +211,18 @@ exports.likeOrDislike = (req, res, next) => {
               .catch((error) => res.status(400).json({ error }));
           }
         })
-        .catch((error) => res.status(400).json({ error }));
     }
   };
 
 
   /***********************GET***********************/
-  // Récupérer toutes les auces dans la BDD
+
+  // Récupérer la liste de toutes les sauces 
   exports.getAllSauces = (req, res, next) => {
+    // Utilisation de find() => permet de trouver les sauces dans la BDD
     Sauce.find()
       .then((sauces) => {
+        // Récupération des sauces sous forme de tableau en JSON
         res.status(200).json(sauces);
       })
       .catch((error) => {

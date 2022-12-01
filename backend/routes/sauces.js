@@ -1,31 +1,36 @@
-/**** ROUTEUR SAUCE ****/
+/**** ROUTEUR SAUCE : ENREGISTRER NOS ROUTES POUR LES SAUCES****/
 
+// Importation d'Express
 const express = require('express');
 const router = express.Router();
 
-// On importe les middlewares requis quant à la gestion et l'authentification des sauces
+// Importation des middlewares requis quant à la gestion et l'authentification des sauces
 const auth = require('../middleware/auth');
+
+// Importation du middleware afin de l'appliquer à la route POST
 const multer = require('../middleware/multer-config');
 
-// On importe la constante du controller des sauces
+// Importation de la constante du controller des sauces
 const saucesCtrl = require('../controllers/sauces');
 
 // Affichage des routes disponibles concernant les sauces
-
-//get() pour répondre uniquement aux demandes GET
-router.get('/', auth, saucesCtrl.getAllSauces);
-
+// Fabrication d'une nouvelle sauce
 router.post('/', auth, multer, saucesCtrl.createSauce);
-//:id => rendre la route accessible en tant que paramètre
-router.get('/:id', auth, saucesCtrl.getOneSauce);
 
-// Route : modification d'un objet existant
+// Modification d'une sauce existante 
 router.put('/:id', auth, multer, saucesCtrl.modifySauce);
 
-// Route : suppression d'un objet existant
+// Suppression d'une sauce précise 
 router.delete('/:id', auth, saucesCtrl.deleteSauce);
 
-//Route POST: like ou dislike selon l'id de l'user
+// Affichage de la fiche produit
+router.get('/:id', auth, saucesCtrl.getOneSauce);
+
+// Récupération de toutes les sauces (sur la page d'acceuil)
+router.get('/', auth, saucesCtrl.getAllSauces);
+
+// Liker ou disliker une sauce selon l'id de l'user
 router.post('/:id/like', auth, saucesCtrl.likeOrDislike);
 
+// Exporter le module router pour les routes
 module.exports = router;

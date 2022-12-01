@@ -57,7 +57,9 @@ exports.login = (req, res, next) => {
                       userId: user._id,
                       //Chiffrer un nouveau token
                       token: jwt.sign(
+                        // Récupération de l'id utilisateur
                           { userId: user._id },
+                          // Clé secrète temporaire
                           'RANDOM_TOKEN_SECRET',
                           // Le TOKEN a dune durée de validité de 24H
                           { expiresIn: '24h' }
