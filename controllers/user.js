@@ -60,7 +60,7 @@ exports.login = (req, res, next) => {
                         // Récupération de l'id utilisateur
                           { userId: user._id },
                           // Clé secrète temporaire
-                          'RANDOM_TOKEN_SECRET',
+                          process.env.JWT_SECRET,
                           // Le TOKEN a dune durée de validité de 24H
                           { expiresIn: '24h' }
                       )

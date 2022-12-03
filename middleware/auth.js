@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
     //Récupération du header d'autorisation de la requête
     const token = req.headers.authorization.split(' ')[1]; // Spliter/Diviser la chaine de caractère en tableau entre le Bearer et le Token
     // Décodage du TOKEN avec verify
-    const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     //Récupération du user.id dans le TOKEN
     const userId = decodedToken.userId;
     // Si l'id ne correspond pas on affiche un message d'erreur
