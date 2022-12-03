@@ -19,8 +19,8 @@ const helmet = require('helmet');
 const sanitize = require('express-mongo-sanitize');
 
 
-const Sauce = require('./models/sauces');
-const User = require('./models/user');
+const Sauces = require('./models/Sauces');
+const User = require('./models/User');
 
 // Importation des routes 
 const saucesRoutes = require('./routes/sauces');
