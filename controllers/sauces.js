@@ -21,8 +21,16 @@ exports.createSauce = (req, res, next) => {
     //Opérateur "spread" : copier les champs qui sont dans le corps de la request
       ...sauceObject,
       //URL de l'image
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  });
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      
+    // Initialisation des likes et dislikes de la sauce à 0
+    likes: 0,
+    dislikes: 0,
+
+    // Initialisation des usersLiked et usersDisliked avec des tableaux vides
+    usersLiked: [],
+    usersDisliked: [],
+    });
   // Enregistrement de la sauce dans a BDD avec la méthode 'save'...
   sauce.save()
   //Même si tout se passe bien et que tout est enregistrer, il faut :
