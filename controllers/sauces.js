@@ -151,7 +151,7 @@ exports.likeOrDislike = (req, res, next) => {
     // Si le corps de la requete a 1 like 
         if (likeSauce === 1) {
       // Mise à jour des likes avec 'updateOne'
-      Sauce.findOne(
+      Sauce.updateOne(
         // On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
         { _id: paramsSauce },
         {
