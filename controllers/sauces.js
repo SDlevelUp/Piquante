@@ -1,7 +1,7 @@
 /********* CONTROLLER SAUCE *********/
 
 // Importation du modèle sauce
-const Sauce = require('../models/Sauces');
+const Sauce = require('../models/sauces');
 
 // Appel du package fs de Node => permettant de modifier le système de fichiers
 const fs = require('fs');
@@ -16,13 +16,19 @@ exports.createSauce = (req, res, next) => {
   // Vu que le frontend renvoie également un id (générer automatiquement par MongoDB),
   // ... on va enlever le champ id du corps de la requête avant de copier l'objet
   delete sauceObject._id;
+  delete sauceObject._userId;
   // Dans la constante 'sauce' on lui passe comme objet toutes les infos requises  
   const sauce = new Sauce({
     //Opérateur "spread" : copier les champs qui sont dans le corps de la request
       ...sauceObject,
+      userId: req.auth.userId,
       //URL de l'image
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  });
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+      likes: 0,
+      dislikes: 0,
+      usersLikes: [],
+      usersDisliked: []
+    });
   // Enregistrement de la sauce dans a BDD avec la méthode 'save'...
   sauce.save()
   //Même si tout se passe bien et que tout est enregistrer, il faut :
@@ -75,7 +81,7 @@ exports.modifySauce = (req, res, next) => {
       .then((sauce) => {
         //et on vérifie qu'il appartient à l'utilisateur qui effectue la modification
           if (sauce.userId != req.auth.userId) { //Si le champ userId récupérer est différent de l'user id venant du token => qqun modifie un objet ne lui appartenant pas
-              res.status(403).json({ message : 'Not authorized'});
+              res.status(403).json({ message : "Unauthorized request"});
           } else {
             //Cas où l'userId est OK : Mettre à jour l'enregistrement de la modification
               Sauce.updateOne({ _id: req.params.id}, { ...sauceObject, _id: req.params.id})//...sauceObject, _id : ce qui est récupérer avec l'Id venant des paramètre de l'URL
@@ -89,7 +95,6 @@ exports.modifySauce = (req, res, next) => {
           res.status(400).json({ error });
       });
 };
-
 
 
 /***********************DELETE***********************/
@@ -118,7 +123,7 @@ exports.deleteSauce = (req, res, next) => {
                 res.status(200).json({ message: 'Sauce removed !' });
               })
               // Échec: code 400
-              .catch((error) => res.status(400).json({ error }));
+              .catch((error) => res.status(401).json({ error }));
           });
         }
       })
