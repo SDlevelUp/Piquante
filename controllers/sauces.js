@@ -22,7 +22,7 @@ exports.createSauce = (req, res, next) => {
       ...sauceObject,
       //URL de l'image
       imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-      
+
     // Initialisation des likes et dislikes de la sauce à 0
     likes: 0,
     dislikes: 0,
@@ -126,7 +126,7 @@ exports.deleteSauce = (req, res, next) => {
                 res.status(200).json({ message: 'Sauce removed !' });
               })
               // Échec: code 400
-              .catch((error) => res.status(400).json({ error }));
+              .catch((error) => res.status(401).json({ error }));
           });
         }
       })
@@ -151,7 +151,7 @@ exports.likeOrDislike = (req, res, next) => {
     // Si le corps de la requete a 1 like 
         if (likeSauce === 1) {
       // Mise à jour des likes avec 'updateOne'
-      Sauce.updateOne(
+      Sauce.findOne(
         // On vérifie bien que c'est le bon utilisateur à l'origine de la requête avec les bons paramètres
         { _id: paramsSauce },
         {
