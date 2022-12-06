@@ -19,9 +19,8 @@ const helmet = require('helmet');
 const sanitize = require('express-mongo-sanitize');
 
 
-// Importation des modèles utilisateur et sauces
-const Sauce = require('./models/sauces')
-const User = require('./models/user')
+const Sauce = require('./models/sauces');
+const User = require('./models/user');
 
 // Importation des routes 
 const saucesRoutes = require('./routes/sauces');
@@ -29,6 +28,7 @@ const userRoutes = require('./routes/user');
 
 // App Express (framework backend)
 const app = express();
+
 //RateLimit : limiter les demandes répétées aux API publiques et/ou aux points de terminaison 
 // => comme les demandes de réinitialisation du MDP
 const rateLimit = require('express-rate-limit')
@@ -55,9 +55,16 @@ app.use((req, res, next) => {
   //Accéder à l'API depuis n'importe quelle origine avec => '*' 
   res.setHeader('Access-Control-Allow-Origin', '*');
   // Autorisation pour utiliser certains Headers sur l'objet requête
-  res.setHeader('Access-Control-Allow-Headers','Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization'
+  );
   // ...ainsi que certaines méthodes, verbes de requêtes : GET, POST, PUT, etc.
-  res.setHeader('Access-Control-Allow-Methods','GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    //Envoyer des requêtes :
+    'GET, POST, PUT, DELETE, PATCH, OPTIONS'
+  );
   // Appeler next: passer l'éxecution au middleware d'après
   next();
 });
@@ -65,7 +72,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-// Ici, on ajoute les différents middlewarr des fichiers sauces, utilisateur et image
+//EXPORTATION DES ROUTES SAUCES, AUTHENTIFICATION ET IMAGE
 app.use('/api/sauces', saucesRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));

@@ -4,7 +4,7 @@
 const jwt = require('jsonwebtoken');
 
 //Variables d'environnement 
-require('dotenv').config();
+const dotenv = require("dotenv").config();
 
 //Utilisation de ce middleware pour vérifier que l'USER est bien connecté et
 //....transmettre les informations de connexions
@@ -18,7 +18,7 @@ module.exports = (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     //Récupération du user.id dans le TOKEN
     const userId = decodedToken.userId;
-    // Ajouter l'userId à l'objet requête pour exploité les différentes routes
+    // Si l'id ne correspond pas on affiche un message d'erreur
     req.auth = {
       userId: userId
     };
