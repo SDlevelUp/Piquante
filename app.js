@@ -11,16 +11,13 @@ require('dotenv').config();
 // Path : donne accés au chemin du système de fichiers
 const path = require('path');
 
-// Helmet : protéger votre application de certaines vulnérabilités, 
+// Helmet : protège l'application de certaines vulnérabilités, 
 // => il ajoute des en-têtes HTTP qui empêchent le détournement d’informations.
 const helmet = require('helmet');
 
 // Import de Mongo-sanitize => pprimera toutes les clés commençant par '$', ainsi assainir votre code
 const sanitize = require('express-mongo-sanitize');
 
-
-const Sauce = require('./models/Sauces');
-const User = require('./models/User');
 
 // Importation des routes 
 const saucesRoutes = require('./routes/sauces');
