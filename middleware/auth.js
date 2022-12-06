@@ -4,7 +4,7 @@
 const jwt = require('jsonwebtoken');
 
 //Variables d'environnement 
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 
 //Utilisation de ce middleware pour vérifier que l'USER est bien connecté et
 //....transmettre les informations de connexions
@@ -18,14 +18,14 @@ module.exports = (req, res, next) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     //Récupération du user.id dans le TOKEN
     const userId = decodedToken.userId;
-    // Si l'id ne correspond pas on affiche un message d'erreur
+    // Ajouter l'userId à l'objet requête pour exploité les différentes routes
     req.auth = {
       userId: userId
     };
     // Fonction qui permet de passer à la fonction suivante une fois celle-ci terminée
     next();
   } catch (error) {
-    // Error 401
-    res.status(401).json({ error });
+    // Error 403
+    res.status(403).json({ error: error | "Unauthorized request"});
   }
 };

@@ -23,4 +23,4 @@ const sauceSchema = mongoose.Schema({ //mongoose.Schema : package mis à disposi
 });
 
 //Exportation du modèle terminer : en arguments => le nom du modèle et le schéma utilisé
-module.exports = mongoose.model("Sauce", sauceSchema);
+module.exports = mongoose.model('Sauce', sauceSchema);
