@@ -4,7 +4,7 @@
 const jwt = require('jsonwebtoken');
 
 //Variables d'environnement 
-require("dotenv").config();
+require('dotenv').config();
 
 //Utilisation de ce middleware pour vérifier que l'USER est bien connecté et
 //....transmettre les informations de connexions
@@ -25,7 +25,7 @@ module.exports = (req, res, next) => {
     // Fonction qui permet de passer à la fonction suivante une fois celle-ci terminée
     next();
   } catch (error) {
-    // Error 403
-    res.status(403).json({ error: error | "Unauthorized request"});
+    // Error 401
+    res.status(401).json({ error });
   }
 };

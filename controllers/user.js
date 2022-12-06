@@ -1,4 +1,4 @@
-/************************* CONTROLLERS / USER *************************/
+//************************* CONTROLLERS / USER *************************/
 
 // On exporte le 'models/User' afin 'd'enregistrer et pouvoir lire' les users
 const User = require('../models/User');
