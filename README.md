@@ -10,7 +10,7 @@ Construisez une API sécurisée pour une application d'avis gastronomiques
 
 *How to run the project ?*
 
-First clone this repository for the frontend
+First clone this repository for the frontend, tape
 
 `git clone https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6`
 
@@ -18,19 +18,27 @@ Then clone this repository for the backend
 
 Add a folder named "images" in the backend
 
-Start server on backend folder
+Run in the terminal  :
 
 `cd backend`
 
-`nodemon server`
+Typing : 
+`npm i`
+
+And :
+`nodemon`
 
 Start the frontend, with the following manipulation:
 
+Run in the terminal, in the folder `frontend` :
 `cd frontend`
 
+Typing :
 `npm start`
 
-Bonne visite !
+Rename the template.env file to .env and enter your MongoDB credentials, Email encryption key and JWT token
+
+Good visit !
 ---- 
 
 **SENARIO**
