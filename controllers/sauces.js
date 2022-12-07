@@ -115,7 +115,6 @@ exports.deleteSauce = (req, res, next) => {
           //Renvoie un message d'erreur si c'est pas le cas
           res.status(401).json({ message: 'You are not allowed to delete this sauce' });
         } else {
-          //Sinon, on peut passer à l'étape suivante : la suppression de l'image du dossier backend
           //Constante pour appeler le fichier à supprimer
           const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];//Récupération du nom du fichier avec split autour du répertoire image
           //Supprimer le fichier avec la méthode unlink de fs

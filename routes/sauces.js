@@ -14,6 +14,7 @@ const multer = require('../middleware/multer-config');
 const saucesCtrl = require('../controllers/sauces');
 
 // Affichage des routes disponibles concernant les sauces
+
 // Fabrication d'une nouvelle sauce
 router.post('/', auth, multer, saucesCtrl.createSauce);
 
