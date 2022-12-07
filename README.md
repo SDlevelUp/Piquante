@@ -10,15 +10,11 @@ Construisez une API sécurisée pour une application d'avis gastronomiques
 
 *How to run the project ?*
 
-First clone this repository for the frontend, tape
+FIRST : 
 
-`git clone https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6`
+Download the project zip file, rename it as you want, for example 'Piiquante' or 'Hot Takes' :
 
-Then clone this repository for the backend
-
-Add a folder named "images" in the backend
-
-Run in the terminal  :
+Run in the terminal VS Code  :
 
 `cd backend`
 
@@ -27,6 +23,13 @@ Typing :
 
 And :
 `nodemon`
+
+NEXT :
+
+Clone this repository for the frontend, typin on VS Code the commande `git clone`, and enter the following link :
+`https://github.com/OpenClassrooms-Student-Center/Web-Developer-P6`
+
+And rename it to 'frontend'.
 
 Start the frontend, with the following manipulation:
 
