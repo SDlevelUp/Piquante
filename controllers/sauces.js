@@ -3,8 +3,8 @@
 const Sauce = require('../models/Sauces');
 const fs = require('fs');
 
+
 exports.createSauce = (req, res, next) => {
-  
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
    const sauce = new Sauce({
@@ -20,6 +20,7 @@ exports.createSauce = (req, res, next) => {
       .then(() => res.status(201).json({ message: 'Saved sauce' })) 
       .catch(error => res.status(400).json({ error })); 
 };
+
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({_id: req.params.id})
@@ -67,8 +68,8 @@ exports.deleteSauce = (req, res, next) => {
         if (sauce.userId != req.auth.userId) {
           res.status(401).json({ message: 'You are not allowed to delete this sauce' });
         } else {
-          const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];//Récupération du nom du fichier avec split autour du répertoire image
-          fs.unlink(`images/${deleteFileImgStorage}`, () => { //() => { : Callback : méthode qui va être appelée une fois que la suppression aura eu lieu, la suppression est faite de manière asynchrones
+          const deleteFileImgStorage = sauce.imageUrl.split('/images/')[1];
+          fs.unlink(`images/${deleteFileImgStorage}`, () => { //() => { 
             Sauce.deleteOne({ _id: req.params.id })
               .then(() => {
                 res.status(200).json({ message: 'Sauce removed !' });
@@ -93,9 +94,7 @@ exports.likeOrDislike = (req, res, next) => {
       Sauce.updateOne(
         { _id: paramsSauce },
         {
-          // User clique sur like => il est pusher dans le tableau des usersLiked
           $push: { usersLiked: userId},
-          // ... Et on incrémente 1 like (c'est-à-dire d'ajouter un)
           $inc: { likes: +1 },
         }
       )
@@ -145,7 +144,7 @@ exports.likeOrDislike = (req, res, next) => {
   };
 
 
-  exports.getAllSauces = (req, res, next) => {
+exports.getAllSauces = (req, res, next) => {
     Sauce.find()
       .then((sauces) => {
         res.status(200).json(sauces);
